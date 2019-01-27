@@ -38,7 +38,7 @@ bot.start((message) => {
     'Metti una frase che indichi i componenti della prima squadra, della seconda e il punteggio.\n' +
     'Per esempio: Michele e Luca, Matteo e Sannino 10 a 3.\n' +
     'Puoi usare punteggiatura e congiunzioni se vuoi.\n' +
-    'Le persone le cerco come sottstringhe.\n' +
+    'Le persone le cerco come sottostringhe.\n' +
     'Per ora conosco:\n' + persone.map(x => '- ' + x).join('\n') + '\n' +
     'Per esempio Giuseppe è ambiguo: scrivi Sannino o Magnotta invece...\n' + 
     'Se devi aggiungere qualcuno, chiedi a Michele invece!'
