@@ -1,6 +1,7 @@
+const proc = require('process')
 
-const telegraphBotId = process.env.TELEGRAM_BOT_ID
-const googleSpreadsheetId = process.env.SPREADSHEET_ID
+const telegraphBotId = proc.env.TELEGRAM_BOT_ID
+const googleSpreadsheetId = proc.env.SPREADSHEET_ID
 
 const strftime = require('strftime')
 const Telegraf = require('telegraf');
