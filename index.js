@@ -6,7 +6,7 @@ const strftime = require('strftime')
 const Telegraf = require('telegraf');
 const bot = new Telegraf(telegraphBotId);
 const GoogleSpreadsheet = require('google-spreadsheet');
-const creds = require('./client_secret.json');
+const creds = require('/etc/credentials/serviceaccount/client_secret.json');
 
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 var doc = new GoogleSpreadsheet(googleSpreadsheetId);
