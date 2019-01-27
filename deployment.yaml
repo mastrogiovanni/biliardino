@@ -1,0 +1,47 @@
+apiVersion: v1
+data:
+  client_secret.json: |
+    {
+      "type": "service_account",
+      "project_id": "biliardino",
+      "private_key_id": "4e93d01152e3e3d02f6d7c12f33112b114fa0cf4",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC9Gz1qEUvd4nYx\nnALhOzk0XgHKypAcUR13XBNrsGH0WF7NzWCHah3kX8ahl1ZqM/lLvzIsDrwm2Lqd\nkgrE2KBs0c7X3yUp8D5CKQo4wstUSEZ/PouF5m62PMQGnYMKDKmx+uMKJ944D1QB\nWF4xUqR7QNbfDRY8jTrvgPf1H48PtSohkyoHUvtbF/30gSNsJ/w3leyum6b5CEbv\n0/sX41mVLrVQ7zA8Kkmoip6g6ieALLcPAOUWyT19EtVak1qQGtcVdKAR7Qe2BqQ8\nyC5q5NFCwfv+AeaNBby8W23StWbLEmx9mGAF6UlemXPRcrZ+23nvNw1vqDfDegfL\nsCR0rTVDAgMBAAECggEAQfuGM0MzuIjy+p5X9uSmMhp2/54sKGU5JdOPxyx1ET/g\nXGjDvJwPMAcnFGzsrwPRgVeGFw9RITDP9HjnnwWC/FU8md/3ZKm533XYZjO5pH/P\ncUiOgDsF+Do9n51IArKmZz6GB54fkGnwwsNlokoWsBbQomU7lAcnQDg8zF+lmDHh\nIRTj/tH3tn1KBdQuwvtId9lqluA1OgsSSIzwH2hYSGErahISM6jCeiueIOM+G3sf\nZkUxzhuli3sCwSdJITzU49cbtE52hq6lRwXib9ibGpDNKvUVc5dsBnd3RFN/KO3z\noIhtSALQkXgckNRZb+B8kDQacuqHSj74u7FApZdR0QKBgQDu0pReWsBobIfzxLU0\nB45nHzwYsWTxt4wzmElzDjV2e9IiEC7GeC1gCI7bdyKNKy9X3SmyDcIIrliRAWy+\nZNTJ+OVIvBs9yaXoKi9xGeOc5c5xd5o4/vcb68AEgLIJEUa6RSkUeH6NUIyXOK0K\nFHieK2l/hwO/sYAwBG693Cu32QKBgQDKtT2WpVRmtLHdqYT5OHIXjQz344Xmyqfg\n7FKPJ3ElQ/+8Z1jdrvPgZqEoD0PvvjjGV7UNoPmkQQkImQevkH1XvgRHooygeimt\nYIkd+oKkyHiIE3M87IX+0m0n66WrFGLB8bm2Jd8oa8TDsCvIHCH9G4g0QfJUQmdA\n557xnn7gewKBgQCmqY/e1MgnV238wM6Pk6Jd9p8ywEEoqiWOL/057LWEjN5U5SQv\nXtiThwVixJ35FCUC1RVu60j4U+r8rpjbuXQBys7/Vj5QfTNpdF8NN7ru2DScXJHk\nqpF6C6hBvCoCR+sqvG7xmTD/nzGtqmCfgy+1eagy1d7Y3J8PY1iA6HAd6QKBgQCW\nstsQreTrXhaFZkuXRCF95LzpZVrc03ivPMG772SsgbsUA/kLBdAE2gehUof9Kfvn\naLkPYsd1F2xx2eLe4JpuqrNf1jaZ73ggjw4hHWYWv3rsHxmjB2wun53K+eN2Jnet\nG9om0kzvLf9gRA6ofFHAa8F8qDJR9fPxSsDdfClzFQKBgD8r2mBuHAH/ApcMDQTS\nEFio+/SfyYR7gfk63PTSSVdelQff64JPee4IRcHxjhzwqj6VDwda2iFhGg8yATUJ\n/MAHY6gaxNcLLC8K+46LtL3oj/fANSRX1j8MZJwVcCnqwWxdceSprC8HBcGpcWex\nVcFyht8YhYn1j5WkKIgJCxjj\n-----END PRIVATE KEY-----\n",
+      "client_email": "biliardino@biliardino.iam.gserviceaccount.com",
+      "client_id": "112902939573388251930",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/biliardino%40biliardino.iam.gserviceaccount.com"
+    }
+kind: ConfigMap
+metadata:
+  name: bot-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: biliardino-bot
+  labels:
+    app: biliardino
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: biliardino
+  template:
+    metadata:
+      labels:
+        app: biliardino
+    spec:
+      containers:
+      - name: biliardino
+        image: mastrogiovanni/biliardino
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-bot
+          mountPath: /etc/credentials/serviceaccount
+      volumes:
+        - name: config-bot
+          configMap:
+            name: bot-config
