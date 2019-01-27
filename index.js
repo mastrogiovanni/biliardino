@@ -1,6 +1,6 @@
 
-const telegraphBotId = '677463954:AAE6KxrOLXEa4iU8tNBHJ4TEAydI-HknkYw'
-const googleSpreadsheetId = '1-UIipQ3Pe3IHTUC27pqo603gcx4CW6CtcQQDfg9LqVM'
+const telegraphBotId = process.env.TELEGRAM_BOT_ID
+const googleSpreadsheetId = process.env.SPREADSHEET_ID
 
 const strftime = require('strftime')
 const Telegraf = require('telegraf');
