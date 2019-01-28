@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: bot-config
 data:
-  telegram_bot_id: "677463954:AAE6KxrOLXEa4iU8tNBHJ4TEAydI-HknkYw"
-  spreadsheet_id: "1-UIipQ3Pe3IHTUC27pqo603gcx4CW6CtcQQDfg9LqVM"
+  telegram_bot_id: "-"
+  spreadsheet_id: "-"
   client_secret.json: |
     {
       "type": "service_account",
