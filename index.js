@@ -12,37 +12,97 @@ const creds = require('/etc/credentials/serviceaccount/client_secret.json');
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 var doc = new GoogleSpreadsheet(googleSpreadsheetId);
 
-const persone = [
-  'Andrea',
-  'Antonio Santilli',
-  'Ferruccio Costantini',
-  'Francesco Fusco',
-  'Francesco Mazzone',
-  'Giuseppe Magnotta',
-  'Giuseppe Sannino',
-  'Luca',
-  'Luciano Coccia',
-  'Marta',
-  'Matteo D\'Amico',
-  'Michele Mastrogiovanni',
-  'Teresa Macchia',
-  'Giorgio Sestili',
-  'Alfredo',
-  'Paola Nanci',
-]
+function getAllPersone() {
+  return new Promise(function(accept, reject) {
+      doc.useServiceAccountAuth(creds, function (err) {
+          if (err) {
+              reject(err)
+          }
+          else {
+              doc.getRows(2, function (err, rows) {
+                  if (err) {
+                      reject(err)
+                  }
+                  accept(rows.map(row => row.nome))
+              })
+          }
+      })
+  })
+}
+
+/*
+function getAllPersone() {
+
+  const persone = [
+    'Andrea',
+    'Antonio Santilli',
+    'Ferruccio Costantini',
+    'Francesco Fusco',
+    'Francesco Mazzone',
+    'Giuseppe Magnotta',
+    'Giuseppe Sannino',
+    'Luca',
+    'Luciano Coccia',
+    'Marta',
+    'Matteo D\'Amico',
+    'Michele Mastrogiovanni',
+    'Teresa Macchia',
+    'Giorgio Sestili',
+    'Alfredo',
+    'Paola Nanci',
+  ]
+
+  return persone
+}
+*/
 
 bot.start((message) => {
   console.log('started:', message.from.id)
-  return message.reply(
-    'Ciao! Sono il Bot responsabile di segnare le partite di Biliardino. ' +
-    'Metti una frase che indichi i componenti della prima squadra, della seconda e il punteggio.\n' +
-    'Per esempio: Michele e Luca, Matteo e Sannino 10 a 3.\n' +
-    'Puoi usare punteggiatura e congiunzioni se vuoi.\n' +
-    'Le persone le cerco come sottostringhe.\n' +
-    'Per ora conosco:\n' + persone.map(x => '- ' + x).join('\n') + '\n' +
-    'Per esempio Giuseppe è ambiguo: scrivi Sannino o Magnotta invece...\n' + 
-    'Se devi aggiungere qualcuno, chiedi a Michele invece!'
-  );
+  getAllPersone().then(function(persone) {
+    message.reply(
+      'Ciao! Sono il Bot responsabile di segnare le partite di Biliardino. ' +
+      'Metti una frase che indichi i componenti della prima squadra, della seconda e il punteggio.\n' +
+      'Per esempio: Michele e Luca, Matteo e Sannino 10 a 3.\n' +
+      'Puoi usare punteggiatura e congiunzioni se vuoi.\n' +
+      'Le persone le cerco come sottostringhe.\n' +
+      'Per ora conosco:\n' + persone.map(x => '- ' + x).join('\n') + '\n' +
+      'Per esempio Giuseppe è ambiguo: scrivi Sannino o Magnotta invece...\n' + 
+      'Se devi aggiungere qualcuno, chiedi a Michele invece!'
+    );
+  }).catch(function(err) {
+
+    const persone = [
+      'Andrea',
+      'Antonio Santilli',
+      'Ferruccio Costantini',
+      'Francesco Fusco',
+      'Francesco Mazzone',
+      'Giuseppe Magnotta',
+      'Giuseppe Sannino',
+      'Luca',
+      'Luciano Coccia',
+      'Marta',
+      'Matteo D\'Amico',
+      'Michele Mastrogiovanni',
+      'Teresa Macchia',
+      'Giorgio Sestili',
+      'Alfredo',
+      'Paola Nanci',
+    ]
+  
+    message.reply(
+      'Ciao! Sono il Bot responsabile di segnare le partite di Biliardino. ' +
+      'Metti una frase che indichi i componenti della prima squadra, della seconda e il punteggio.\n' +
+      'Per esempio: Michele e Luca, Matteo e Sannino 10 a 3.\n' +
+      'Puoi usare punteggiatura e congiunzioni se vuoi.\n' +
+      'Le persone le cerco come sottostringhe.\n' +
+      'Per ora conosco:\n' + persone.map(x => '- ' + x).join('\n') + '\n' +
+      'Per esempio Giuseppe è ambiguo: scrivi Sannino o Magnotta invece...\n' + 
+      'Se devi aggiungere qualcuno, chiedi a Michele invece!'
+    );
+
+  })
+  
 })
 
 /**
@@ -51,20 +111,28 @@ bot.start((message) => {
  * @param {} text Testo da parsare
  */
 function getPersona(text) {
-  const filtered = persone.filter(x => x.toLowerCase().indexOf(text.toLowerCase()) >= 0)
-  if (filtered.length == 0) {
-    return { message: 'Non trovo la persona ' + text }
-  }
-  if (filtered.length > 1) {
-    return { message: 'Non capisco chi devo scegliere: sono indeciso fra ' + JSON.stringify(filtered) }
-  }
-  return { persona: filtered[0] }
+  return new Promise(function(accept, reject) {
+    getAllPersone().then(function(persone) {
+      const filtered = persone.filter(x => x.toLowerCase().indexOf(text.toLowerCase()) >= 0)
+      if (filtered.length == 0) {
+        accept({ message: 'Non trovo la persona ' + text })
+        return
+      }
+      if (filtered.length > 1) {
+        accept({ message: 'Non capisco chi devo scegliere: sono indeciso fra ' + JSON.stringify(filtered) })
+        return
+      }
+      accept({ persona: filtered[0] })
+    }).catch(function(err) {
+      reject(err)
+    })
+  }) 
 }
 
-function getPersone(components) {
+async function getPersone(components) {
   var result = ''
   for (var i = 0; i < 4; i++) {
-    var response = getPersona(components[i])
+    var response = await getPersona(components[i])
     if (response.message !== undefined) {
       result += "\n" + response.message
     }
@@ -100,17 +168,24 @@ function process(text, callback) {
     return;
   }
 
-  var message = getPersone(components)
-  message = message.trim()
-  if (message !== '') {
-    callback({
-      error: message
-    })
-    return;
-  }
+  var message = getPersone(components).then(function(message) {
 
-  callback({
-    data: components
+    message = message.trim()
+    if (message !== '') {
+      callback({
+        error: message
+      })
+      return;
+    }
+  
+    callback({
+      data: components
+    })
+  
+  }).catch(function(err) {
+    callback({
+      error: err
+    })
   })
 
 }
